@@ -1,4 +1,0 @@
-r2-core#sh run sec icmp
-mpls icmp ttl-exceeded tunneling
-mpls icmp ipv6 source-interface Loopback0
-mpls icmp ip source-interface Loopback0

@@ -1,9 +1,0 @@
-
-r2-core#sh run sec address-family evpn
-router bgp 65550
-   address-family evpn
-      neighbor 65001v6 activate
-      neighbor 65001v6 encapsulation vxlan
-      neighbor 65550v6 activate
-      neighbor 65550v6 encapsulation mpls next-hop-self source-interface Loopback0
-      neighbor default next-hop-self received-evpn-routes route-type ip-prefix}
