@@ -1,7 +1,4 @@
 
-IPV6
-
-l2-leaf#
 l2-leaf#sh bgp evpn route-type ip-prefix 2001:123:123:123::123/128
 BGP routing table information for VRF default
 Router identifier 112.112.112.12, local AS number 64523
@@ -35,7 +32,6 @@ Source Codes:
  B I      2001:123:123:123::123/128 [200/0]
            via VTEP 2001:112:112:112::112 VNI 10 router-mac 00:1c:73:7d:1e:ff local-interface Vxlan1
 
-l2-leaf#
 l2-leaf#traceroute vrf evpn_1 ipv6 2001:123:123:123::123
 traceroute to 2001:123:123:123::123 (2001:123:123:123::123), 30 hops max, 80 byte packets
  1  2001:112:112:112::112 (2001:112:112:112::112)  5.064 ms  5.440 ms  6.230 ms
@@ -45,10 +41,6 @@ traceroute to 2001:123:123:123::123 (2001:123:123:123::123), 30 hops max, 80 byt
 l2-leaf#
 
 
-
-IPV4
-
-l2-leaf#
 l2-leaf#sh bgp evpn route-type ip-prefix 123.123.123.123/32
 BGP routing table information for VRF default
 Router identifier 112.112.112.12, local AS number 64523
@@ -94,4 +86,3 @@ traceroute to 123.123.123.123 (123.123.123.123), 30 hops max, 60 byte packets
  3  123.123.123.123 (123.123.123.123)  19.437 ms  21.414 ms  21.835 ms
 l2-leaf#
 l2-leaf#
-
