@@ -312,7 +312,7 @@ $ docker import cEOS-lab-$EOS_VERSION.tar ceos:$EOS_VERSION
 
 ```
 
-The Topology based on the basic.clab.yml yaml file
+The Topology based on the gateway.clab.yml yaml file
 
 [yaml file](gateway.clab.yml)
 
