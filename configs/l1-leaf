@@ -1,0 +1,132 @@
+! device: l1-leaf (cEOSLab, EOS-4.35.0F-44178984.4350F (engineering build))
+!
+no aaa root
+!
+username admin privilege 15 role network-admin secret sha512 $6$txqL1MQa/s2Iww/0$jnKfVErP9MhpI0NZlgfH2Acevz5wjBeAuxpqmiF4/EoNSgB7Cl5FelGnVrQeuG8wLJG8c/khjBWDtPR/Go8N61
+username lunkan privilege 15 role network-admin secret sha512 $6$tnHoOd3ZWokfAU6C$LsSOjZlW3jpfiENhZymMPBTRhYBgivDf5JRaxTVkyNk6WbHrwZdT/C28YtM9UEzCzr7XsN8gdhvbZK7YZ1eSw/
+!
+management api http-commands
+   no shutdown
+!
+alias ls dir
+!
+switchport default mode routed
+!
+no service interface inactive port-id allocation disabled
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname l1-leaf
+!
+spanning-tree mode none
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+vrf instance evpn_1
+!
+vrf instance evpn_2
+!
+management api gnmi
+   transport grpc default
+!
+management api netconf
+   transport ssh default
+!
+interface Ethernet2
+   no switchport
+   ipv6 address 2001:2:2:2::5/127
+!
+interface Loopback0
+   ip address 111.111.111.11/32
+   ipv6 address 2001:111:111:111::11/128
+!
+interface Loopback1
+   vrf evpn_1
+   ip address 123.123.123.123/32
+   ipv6 address 2001:123:123:123::123/128
+   hardware forwarding id
+!
+interface Management0
+   ip address 192.168.5.11/24
+!
+interface Vxlan1
+   vxlan source-interface Loopback0
+   vxlan udp-port 4789
+   vxlan encapsulation ipv6
+   icmp helper vrf all
+   vxlan vrf evpn_1 vni 10
+   vxlan vrf evpn_2 vni 20
+!
+ip routing ipv6 interfaces 
+ip routing ipv6 interfaces  vrf evpn_1
+ip routing ipv6 interfaces  vrf evpn_2
+!
+ipv6 unicast-routing
+ipv6 unicast-routing vrf evpn_1
+ipv6 unicast-routing vrf evpn_2
+!
+ip route 0.0.0.0/0 192.168.5.1
+!
+router bgp 64513
+   router-id 111.111.111.11
+   no bgp default ipv4-unicast
+   bgp restart hitless disabled
+   bgp transport pmtud
+   maximum-paths 2 ecmp 2
+   neighbor 65000 peer group
+   neighbor 65000 remote-as 65000
+   neighbor 65000 shutdown
+   neighbor 65000 local-as 65000 no-prepend replace-as
+   neighbor 65000 update-source Loopback0
+   neighbor 65000 additional-paths send any
+   neighbor 65000 send-community extended
+   neighbor 65000 maximum-routes 0
+   neighbor 65000v6 peer group
+   neighbor 65000v6 remote-as 65000
+   neighbor 65000v6 local-as 65000 no-prepend replace-as
+   neighbor 65000v6 update-source Loopback0
+   neighbor 65000v6 additional-paths send any
+   neighbor 65000v6 send-community extended
+   neighbor 65000v6 maximum-routes 0
+   neighbor fabric peer group
+   neighbor fabric shutdown
+   neighbor fabric rib-in pre-policy retain all
+   neighbor fabric send-community standard extended large
+   neighbor fabric maximum-routes 0
+   neighbor fabricv6 peer group
+   neighbor fabricv6 remote-as 64512
+   neighbor fabricv6 rib-in pre-policy retain all
+   neighbor fabricv6 send-community standard extended large
+   neighbor fabricv6 maximum-routes 0
+   neighbor 2001:2:2:2::4 peer group fabricv6
+   neighbor 2001:111:111:111::111 peer group 65000v6
+   !
+   address-family evpn
+      neighbor 65000v6 activate
+   !
+   address-family ipv6
+      neighbor fabricv6 activate
+      redistribute connected
+   !
+   vrf evpn_1
+      rd 111.111.111.11:10
+      route-target import evpn 65000:10
+      route-target import evpn 65001:10
+      route-target export evpn 65000:10
+      bgp additional-paths send any
+      redistribute connected
+      redistribute static
+      redistribute attached-host
+!
+router multicast
+   ipv4
+      software-forwarding kernel
+   !
+   ipv6
+      software-forwarding kernel
+!
+end

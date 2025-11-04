@@ -1,0 +1,25 @@
+
+r2-core#sh run sec 65001
+router bgp 65550
+   bgp listen range 2001:112:112:112::/64 peer-group 65001v6 remote-as 65001
+   neighbor 65001v6 peer group
+   neighbor 65001v6 remote-as 65001
+   neighbor 65001v6 local-as 65001 no-prepend replace-as
+   neighbor 65001v6 update-source Loopback0
+   neighbor 65001v6 route-reflector-client
+   neighbor 65001v6 additional-paths send any
+   neighbor 65001v6 send-community extended
+   neighbor 65001v6 maximum-routes 0
+   address-family evpn
+      neighbor 65001v6 activate
+      neighbor 65001v6 encapsulation vxlan
+   vrf evpn_1
+      route-target import evpn 65001:10
+      route-target export evpn 65001:10
+(..)
+
+r2-core#sh bgp sum | grep 2001:112:112:112::12
+2001:112:112:112::12        65001 Established   L2VPN EVPN              Negotiated              2          2          6
+
+
+

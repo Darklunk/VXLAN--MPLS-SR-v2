@@ -1,0 +1,111 @@
+! device: s1-spine (cEOSLab, EOS-4.35.0F-44178984.4350F (engineering build))
+!
+no aaa root
+!
+username admin privilege 15 role network-admin secret sha512 $6$9QUrhfMNz8pAyjbu$dFHOUWBPBQC5cdLxNATuBZkZb.vpVAiTyQl4ItRdQJuTkoCsh6lMNWGaRS0yhDCUiysrFe7Am38KXWigRqPjh.
+!
+management api http-commands
+   no shutdown
+!
+switchport default mode routed
+!
+no service interface inactive port-id allocation disabled
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname s1-spine
+!
+spanning-tree mode none
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+management api gnmi
+   transport grpc default
+!
+management api netconf
+   transport ssh default
+!
+interface Ethernet1
+   description s1-r2
+   no switchport
+   ipv6 address 2001:2:2:2::3/127
+!
+interface Ethernet2
+   description s1-l1
+   no switchport
+   ipv6 address 2001:2:2:2::4/127
+!
+interface Loopback0
+   ip address 111.111.111.21/32
+   ipv6 address 2001:111:111:111::21/128
+!
+interface Management0
+   ip address 192.168.5.21/24
+!
+interface Vxlan1
+   vxlan udp-port 4789
+   icmp helper vrf all
+!
+ip virtual-router mac-address aa:aa:aa:aa:aa:aa
+!
+ip routing ipv6 interfaces 
+!
+ipv6 unicast-routing
+!
+ip route 0.0.0.0/0 192.168.5.1
+!
+peer-filter fabric-2byte
+   10 match as-range 64512-65535 result accept
+!
+peer-filter fabric-4byte
+   10 match as-range 1-4294967295 result accept
+!
+router bgp 64512
+   router-id 111.111.111.21
+   no bgp default ipv4-unicast
+   bgp restart hitless disabled
+   bgp transport pmtud
+   maximum-paths 2 ecmp 2
+   bgp listen range 2001:2:2:2::/64 peer-group fabricv6 peer-filter fabric-2byte
+   bgp bestpath tie-break router-id
+   neighbor 65550 peer group
+   neighbor 65550 remote-as 65550
+   neighbor 65550 shutdown
+   neighbor 65550 rib-in pre-policy retain all
+   neighbor 65550 additional-paths send limit 2
+   neighbor 65550 send-community standard extended large
+   neighbor 65550 maximum-routes 0
+   neighbor 65550v6 peer group
+   neighbor 65550v6 remote-as 65550
+   neighbor 65550v6 rib-in pre-policy retain all
+   neighbor 65550v6 additional-paths send limit 2
+   neighbor 65550v6 send-community standard extended large
+   neighbor 65550v6 maximum-routes 0
+   neighbor fabric peer group
+   neighbor fabric shutdown
+   neighbor fabric rib-in pre-policy retain all
+   neighbor fabric send-community standard extended large
+   neighbor fabric maximum-routes 0
+   neighbor fabricv6 peer group
+   neighbor fabricv6 rib-in pre-policy retain all
+   neighbor fabricv6 send-community standard extended large
+   neighbor fabricv6 maximum-routes 0
+   neighbor 2001:2:2:2::2 peer group 65550v6
+   !
+   address-family ipv6
+      neighbor 65550v6 activate
+      neighbor fabricv6 activate
+      redistribute connected
+!
+router multicast
+   ipv4
+      software-forwarding kernel
+   !
+   ipv6
+      software-forwarding kernel
+!
+end

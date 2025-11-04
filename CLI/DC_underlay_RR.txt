@@ -1,0 +1,18 @@
+
+
+s2-spine#sh run sec range
+peer-filter fabric-2byte
+   10 match as-range 64512-65535 result accept
+peer-filter fabric-4byte
+   10 match as-range 1-4294967295 result accept
+router bgp 64522
+   bgp listen range 2001:3:3:3::/64 peer-group fabricv6 peer-filter fabric-2byte
+
+
+s2-spine#sh bgp sum
+BGP summary information for VRF default
+Router identifier 112.112.112.22, local AS number 64522
+Neighbor               AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+------------- ----------- ------------- ----------------------- -------------- ---------- ---------- ----------
+2001:3:3:3::2       65550 Established   IPv6 Unicast            Negotiated             11         11          5
+2001:3:3:3::5       64523 Established   IPv6 Unicast            Negotiated              2          2         11

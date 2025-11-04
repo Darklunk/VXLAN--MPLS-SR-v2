@@ -1,0 +1,145 @@
+! device: r3-core (cEOSLab, EOS-4.35.0F-44178984.4350F (engineering build))
+!
+no aaa root
+!
+username admin privilege 15 role network-admin secret sha512 $6$1qg3aRhYuj7UOrQN$xhLfVALfHlUJJW2lKiKhldOGVKZcTFetbi2jGoT/m3QAkut4VTDuQqilCAMF9nJ.hplH7t1rG5YEVH8E/pq.Q0
+username lunkan privilege 15 role network-admin secret sha512 $6$tnHoOd3ZWokfAU6C$LsSOjZlW3jpfiENhZymMPBTRhYBgivDf5JRaxTVkyNk6WbHrwZdT/C28YtM9UEzCzr7XsN8gdhvbZK7YZ1eSw/
+!
+management api http-commands
+   no shutdown
+!
+alias ls dir
+!
+switchport default mode routed
+!
+no service interface inactive port-id allocation disabled
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname r3-core
+!
+spanning-tree mode mstp
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+management api gnmi
+   transport grpc default
+!
+management api netconf
+   transport ssh default
+!
+aaa authorization exec default local
+!
+interface Ethernet1
+   mtu 9000
+   no switchport
+   ipv6 address 2001:1:1:1::7/127
+   isis enable igp
+   isis network point-to-point
+   traffic-engineering
+!
+interface Ethernet2
+   no switchport
+!
+interface Ethernet3
+   description r3-r1
+   mtu 9000
+   no switchport
+   ipv6 address 2001:1:1:1::5/127
+   isis enable igp
+   isis network point-to-point
+   traffic-engineering
+!
+interface Loopback0
+   ip address 113.113.113.113/32
+   ipv6 address 2001:113:113:113::113/128
+   hardware forwarding id
+   node-segment ipv4 index 13
+   node-segment ipv6 index 613
+   isis enable igp
+   isis metric 0
+   isis passive
+!
+interface Loopback1
+!
+interface Management0
+   ip address 192.168.5.113/24
+!
+ip routing
+!
+ipv6 unicast-routing
+!
+ip route 0.0.0.0/0 192.168.5.1
+!
+mpls ip
+!
+mpls icmp ttl-exceeded tunneling
+mpls icmp ipv6 source-interface Loopback0
+mpls icmp ip source-interface Loopback0
+!
+router bgp 65550
+   bgp cluster-id 113.113.113.113
+   bgp route-reflector preserve-attributes always
+   maximum-paths 2 ecmp 2
+   neighbor 65550 peer group
+   neighbor 65550 remote-as 65550
+   neighbor 65550 shutdown
+   neighbor 65550 update-source Loopback0
+   neighbor 65550 rib-in pre-policy retain all
+   neighbor 65550 route-reflector-client
+   neighbor 65550 send-community extended large
+   neighbor 65550 maximum-routes 0
+   neighbor 65550v6 peer group
+   neighbor 65550v6 remote-as 65550
+   neighbor 65550v6 update-source Loopback0
+   neighbor 65550v6 rib-in pre-policy retain all
+   neighbor 65550v6 route-reflector-client
+   neighbor 65550v6 send-community extended large
+   neighbor 65550v6 maximum-routes 0
+   neighbor defaul peer group
+   neighbor 2001:111:111:111::111 peer group 65550v6
+   neighbor 2001:112:112:112::112 peer group 65550v6
+   !
+   address-family evpn
+      neighbor default encapsulation mpls 
+      neighbor 65550v6 activate
+   !
+   address-family ipv6
+      neighbor 65550v6 activate
+      redistribute connected
+!
+router traffic-engineering
+   segment-routing
+   router-id ipv4 113.113.113.113
+   router-id ipv6 2001:113:113:113::113
+!
+router isis igp
+   net 47.0000.1131.1311.3113.00
+   router-id ipv4 113.113.113.113
+   is-type level-2
+   max-lsp-lifetime 65535
+   !
+   address-family ipv6 unicast
+      maximum-paths 2
+      multi-topology
+      fast-reroute ti-lfa mode link-protection
+   !
+   segment-routing mpls
+      router-id 113.113.113.113
+      no shutdown
+   !
+   traffic-engineering
+      no shutdown
+!
+router multicast
+   ipv4
+      software-forwarding kernel
+   !
+   ipv6
+      software-forwarding kernel
+!
+end

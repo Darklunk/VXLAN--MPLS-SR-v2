@@ -1,0 +1,45 @@
+
+
+r2-core#sh mpls label ranges
+Start     End       Size      Usage
+------------------------------------------------
+0         15        16        reserved
+16        99999     99984     static mpls
+100000    116383    16384     bgp (dynamic)
+116384    132767    16384     bgp (dynamic)
+132768    149151    16384     isis (dynamic)
+149152    362143    212992    free (dynamic)
+362144    899999    537856    unassigned
+900000    965535    65536     ospf-sr
+900000    965535    65536     isis-sr
+900000    965535    65536     bgp-sr
+965536    1031071   65536     srlb
+1031072   1032095   1024      l2evpn shared ethernet-segment
+1032096   1036287   4192      unassigned
+1036288   1048575   12288     l2evpn
+
+
+r2-core#sh run interfaces Loopback0
+interface Loopback0
+   ip address 112.112.112.112/32
+   ipv6 address 2001:112:112:112::112/128
+   node-segment ipv4 index 12
+   node-segment ipv6 index 612
+   isis enable igp
+   isis metric 0
+   isis passive
+
+
+r2-core#sh mpls segment-routing bindings
+2001:111:111:111::111/128
+   Local binding:  Label: 900611
+   Remote binding: Peer ID: r3-core, Label: 900611
+2001:112:112:112::112/128
+   Local binding:  Label: imp-null
+   Remote binding: Peer ID: r3-core, Label: 900612
+2001:113:113:113::113/128
+   Local binding:  Label: 900613
+   Remote binding: Peer ID: r3-core, Label: imp-null
+
+
+

@@ -1,0 +1,200 @@
+! device: r1-core (cEOSLab, EOS-4.35.0F-44178984.4350F (engineering build))
+!
+no aaa root
+!
+username admin privilege 15 role network-admin secret sha512 $6$r9KKomCPKXTFA0qy$wHp/jhFIHzhypPwinPc2nucff/L9VK9WXuqQ5lphw4EfkJkOvJxU5YlAEWCdBw9U4RZrlSO6RBBk/m0LV3ivJ0
+username lunkan privilege 15 role network-admin secret sha512 $6$tnHoOd3ZWokfAU6C$LsSOjZlW3jpfiENhZymMPBTRhYBgivDf5JRaxTVkyNk6WbHrwZdT/C28YtM9UEzCzr7XsN8gdhvbZK7YZ1eSw/
+!
+management api http-commands
+   no shutdown
+!
+alias ls dir
+!
+no service interface inactive port-id allocation disabled
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname r1-core
+!
+spanning-tree mode none
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+vrf instance evpn_1
+!
+vrf instance evpn_2
+!
+management api gnmi
+   transport grpc default
+!
+management api netconf
+   transport ssh default
+!
+interface Port-Channel1
+   shutdown
+   no switchport
+   bfd interval 1000 min-rx 500 multiplier 3
+   bfd neighbor 2001:1:1:1::3
+   bfd per-link rfc-7130
+   isis enable igp
+   isis bfd
+   isis network point-to-point
+   traffic-engineering
+!
+interface Ethernet1
+   no switchport
+   ipv6 address 2001:2:2:2::2/127
+!
+interface Ethernet2
+   description r1-r2
+   mtu 9000
+   no switchport
+   ipv6 address 2001:1:1:1::2/127
+   isis enable igp
+   isis network point-to-point
+   traffic-engineering
+!
+interface Ethernet3
+   mtu 9000
+   no switchport
+   ipv6 address 2001:1:1:1::4/127
+   isis enable igp
+   isis network point-to-point
+   traffic-engineering
+!
+interface Loopback0
+   ip address 111.111.111.111/32
+   ipv6 address 2001:111:111:111::111/128
+   node-segment ipv4 index 11
+   node-segment ipv6 index 611
+   isis enable igp
+   isis metric 0
+   isis passive
+!
+interface Loopback1
+   vrf evpn_1
+   ip address 6.6.6.6/32
+   ipv6 address 2001:666::1/64
+   hardware forwarding id
+!
+interface Management0
+   ip address 192.168.5.111/24
+!
+interface Vxlan1
+   vxlan source-interface Loopback0
+   vxlan udp-port 4789
+   vxlan encapsulation ipv6
+   vxlan vrf evpn_1 vni 10
+   vxlan vrf evpn_2 vni 20
+!
+ip routing ipv6 interfaces 
+ip routing ipv6 interfaces  vrf evpn_1
+ip routing vrf evpn_2
+!
+ipv6 unicast-routing
+ipv6 unicast-routing vrf evpn_1
+ipv6 unicast-routing vrf evpn_2
+!
+ip route 0.0.0.0/0 192.168.5.1
+!
+mpls ip
+!
+mpls icmp ttl-exceeded tunneling
+mpls icmp ipv6 source-interface Loopback0
+mpls icmp ip source-interface Loopback0
+!
+router bgp 65550
+   bgp labeled-unicast rib ip tunnel
+   router-id 111.111.111.111
+   no bgp default ipv4-unicast
+   bgp restart hitless disabled
+   bgp cluster-id 111.111.111.111
+   bgp transport pmtud
+   maximum-paths 2 ecmp 2
+   bgp listen range 2001:111:111:111::/64 peer-group 65000 remote-as 65000
+   bgp bestpath tie-break router-id
+   neighbor 64512v6 peer group
+   neighbor 64512v6 remote-as 64512
+   neighbor 64512v6 rib-in pre-policy retain all
+   neighbor 64512v6 additional-paths send limit 2
+   neighbor 64512v6 send-community extended large
+   neighbor 65000 peer group
+   neighbor 65000 remote-as 65000
+   neighbor 65000 local-as 65000 no-prepend replace-as
+   neighbor 65000 update-source Loopback0
+   neighbor 65000 route-reflector-client
+   neighbor 65000 additional-paths send any
+   neighbor 65000 send-community extended
+   neighbor 65000 maximum-routes 0
+   neighbor 65550 peer group
+   neighbor 65550 remote-as 65550
+   neighbor 65550 shutdown
+   neighbor 65550 update-source Loopback0
+   neighbor 65550 rib-in pre-policy retain all
+   neighbor 65550 additional-paths send limit 2
+   neighbor 65550 send-community extended large
+   neighbor 65550 maximum-routes 0
+   neighbor 65550v6 peer group
+   neighbor 65550v6 remote-as 65550
+   neighbor 65550v6 next-hop-self
+   neighbor 65550v6 update-source Loopback0
+   neighbor 65550v6 rib-in pre-policy retain all
+   neighbor 65550v6 additional-paths send limit 2
+   neighbor 65550v6 send-community extended large
+   neighbor 65550v6 maximum-routes 0
+   neighbor 2001:2:2:2::3 peer group 64512v6
+   neighbor 2001:112:112:112::112 peer group 65550v6
+   neighbor 2001:113:113:113::113 peer group 65550v6
+   !
+   address-family evpn
+      neighbor 65000 activate
+      neighbor 65000 encapsulation vxlan 
+      neighbor 65550v6 activate
+      neighbor 65550v6 encapsulation mpls next-hop-self source-interface Loopback0
+      neighbor default next-hop-self received-evpn-routes route-type ip-prefix
+   !
+   address-family ipv6
+      neighbor 64512v6 activate
+      neighbor 65550v6 activate
+      redistribute connected
+   !
+   vrf evpn_1
+      rd 111.111.111.111:10
+      route-target import evpn 65000:10
+      route-target import evpn 65001:10
+      route-target export evpn 65000:10
+      bgp additional-paths send any
+      redistribute connected
+      redistribute static
+      redistribute attached-host
+!
+router isis igp
+   net 47.0000.1111.1111.1111.00
+   router-id ipv4 111.111.111.111
+   is-type level-2
+   max-lsp-lifetime 65535
+   !
+   address-family ipv6 unicast
+      maximum-paths 2
+      multi-topology
+      fast-reroute ti-lfa mode link-protection
+   !
+   segment-routing mpls
+      router-id 111.111.111.111
+      no shutdown
+   !
+   traffic-engineering
+      no shutdown
+!
+router multicast
+   ipv4
+      software-forwarding kernel
+   !
+   ipv6
+      software-forwarding kernel
+!
+end
