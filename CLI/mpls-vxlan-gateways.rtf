@@ -1,16 +1,9 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2822
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\f0\fs24 \cf0 \
-r2-core#sh run sec address-family evpn\
-router bgp 65550\
-   address-family evpn\
-      neighbor 65001v6 activate\
-      neighbor 65001v6 encapsulation vxlan\
-      neighbor 65550v6 activate\
-      neighbor 65550v6 encapsulation mpls next-hop-self source-interface Loopback0\
+r2-core#sh run sec address-family evpn
+router bgp 65550
+   address-family evpn
+      neighbor 65001v6 activate
+      neighbor 65001v6 encapsulation vxlan
+      neighbor 65550v6 activate
+      neighbor 65550v6 encapsulation mpls next-hop-self source-interface Loopback0
       neighbor default next-hop-self received-evpn-routes route-type ip-prefix}
