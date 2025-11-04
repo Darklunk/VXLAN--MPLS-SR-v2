@@ -56,7 +56,7 @@ r2-core#sh mpls segment-routing bindings
 
 ```
 
-To allow time-exceeded message and thereby make traceroute usefull for the MPLS core, below code stanza needed on the MPLS Core Routers
+To allow time-exceeded message and thereby make traceroute useful for the MPLS core, below code snippet needed on the MPLS Core Routers
 
 ```bash
 r2-core#sh run sec icmp
@@ -67,7 +67,7 @@ mpls icmp ip source-interface Loopback0
 ```
 
 
-The Gateway stanza below show the MPLS vs VXLAN association for specific BGP peer group, this is the Gateway configuration stanza
+The Gateway snippet below shows the MPLS vs VXLAN association for the BGP peer groups, this is the Gateway configuration
 
 ```bash
 r2-core#sh run sec address-family evpn
