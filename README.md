@@ -277,7 +277,6 @@ peer-filter fabric-4byte
 router bgp 64522
    bgp listen range 2001:3:3:3::/64 peer-group fabricv6 peer-filter fabric-2byte
 
-
 s2-spine#sh bgp sum
 BGP summary information for VRF default
 Router identifier 112.112.112.22, local AS number 64522
@@ -308,7 +307,7 @@ $ docker import cEOS-lab-$EOS_VERSION.tar ceos:$EOS_VERSION
 The Topology based on the basic.clab.yml yaml file
 
 ```bash
-[yaml file](basic.clab.yml)
+[yaml file](gateway.clab.yml)
 
 ```
 
