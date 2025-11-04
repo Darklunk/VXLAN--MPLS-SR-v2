@@ -306,10 +306,8 @@ $ docker import cEOS-lab-$EOS_VERSION.tar ceos:$EOS_VERSION
 
 The Topology based on the basic.clab.yml yaml file
 
-```bash
 [yaml file](gateway.clab.yml)
 
-```
 
 ## Containerlab commands
 Containerlab is used to deploy and manage the network topology for this project. 
