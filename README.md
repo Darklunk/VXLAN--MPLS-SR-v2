@@ -12,7 +12,7 @@ NOTE: Both IPv4 and IPv6 carried over the same EVPN peering which is a smooth al
 
 ## EVPN Gateway keypoints
 
-The Routers Node Segment is created as part of node-segment index knob and the labelrange allocated for the protocol, here ISIS. NOTE EOS default allocated range for both ISIS-SR and BGP-SR 900000.  
+The Routers Node Segment is created as part of node-segment index knob and the labelrange allocated for the protocol, here ISIS-SR. NOTE EOS default allocated range for both ISIS-SR and BGP-SR 900000.  
 
 ```bash
 r2-core#sh mpls label ranges
@@ -102,12 +102,16 @@ Source Codes:
 
  B I      2001:123:123:123::123/128 [200/0]
            via 2001:111:111:111::111/128, IS-IS SR tunnel index 1, label 100001
-              via fe80::a8c1:abff:fef9:b10a, Ethernet1, label 900611
+              via TI-LFA tunnel index 0, label imp-null(3)
+                 via fe80::a8c1:abff:fef9:b10a, Ethernet1, label 900611
+                 backup via fe80::a8c1:abff:fef3:1a64, Ethernet2, label imp-null(3)
  B I      2001:132:132:132::132/128 [200/0]
            via VTEP 2001:112:112:112::12 VNI 10 router-mac 00:1c:73:11:0b:01 local-interface Vxlan1
  B I      2001:666::/64 [200/0]
            via 2001:111:111:111::111/128, IS-IS SR tunnel index 1, label 100001
-              via fe80::a8c1:abff:fef9:b10a, Ethernet1, label 900611
+              via TI-LFA tunnel index 0, label imp-null(3)
+                 via fe80::a8c1:abff:fef9:b10a, Ethernet1, label 900611
+                 backup via fe80::a8c1:abff:fef3:1a64, Ethernet2, label imp-null(3)
  C        2001:777::/64 [0/0]
            via Loopback1, directly connected
 
@@ -137,12 +141,16 @@ Gateway of last resort is not set
 
  B I      6.6.6.6/32 [200/0]
            via 2001:111:111:111::111/128, IS-IS SR tunnel index 1, label 100000
-              via fe80::a8c1:abff:fef9:b10a, Ethernet1, label 900611
+              via TI-LFA tunnel index 0, label imp-null(3)
+                 via fe80::a8c1:abff:fef9:b10a, Ethernet1, label 900611
+                 backup via fe80::a8c1:abff:fef3:1a64, Ethernet2, label imp-null(3)
  C        7.7.7.7/32 [0/0]
            via Loopback1, directly connected
  B I      123.123.123.123/32 [200/0]
            via 2001:111:111:111::111/128, IS-IS SR tunnel index 1, label 100000
-              via fe80::a8c1:abff:fef9:b10a, Ethernet1, label 900611
+              via TI-LFA tunnel index 0, label imp-null(3)
+                 via fe80::a8c1:abff:fef9:b10a, Ethernet1, label 900611
+                 backup via fe80::a8c1:abff:fef3:1a64, Ethernet2, label imp-null(3)
  B I      132.132.132.132/32 [200/0]
            via VTEP 2001:112:112:112::12 VNI 10 router-mac 00:1c:73:11:0b:01 local-interface Vxlan1
 
