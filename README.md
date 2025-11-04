@@ -150,7 +150,7 @@ Gateway of last resort is not set
 
 
 Below traceroute validation of end-to-end IPv6 and IPv4 from the EVPN VRF evpn_1.
-NOTE: The direct link between r1-core and r2-core are disabled to force labeling forwarding over r3-core router, else penultimate rule would apply thereby no labeling forwarding.  
+NOTE: The direct link between r1-core and r2-core are not used (ISIS metric) to force labeling forwarding over r3-core router, else penultimate rule would apply thereby no labeling forwarding.  
 
 ```bash
 l2-leaf#sh bgp evpn route-type ip-prefix 2001:123:123:123::123/128
