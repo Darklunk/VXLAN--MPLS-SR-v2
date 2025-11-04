@@ -60,11 +60,11 @@ interface Ethernet1
 !
 interface Ethernet2
    description r2-r1
-   shutdown
    mtu 9000
    no switchport
    ipv6 address 2001:1:1:1::3/127
    isis enable igp
+   isis ipv6 metric 100
    isis network point-to-point
    traffic-engineering
 !
